@@ -28,28 +28,28 @@ import (
 func  main() {
 	// Nune can create tensors of any shapes.
 	_ = tensor.Zeros[int](5, 5) // create a 5x5 tensor
-	_ = tensor.Ones[uint](5, 10, 5, 25) // or a weird one
-	_ = tensor.Full[float32](4, []int{5, 2}) // (value, shape)
+	_ = tensor.Ones[int](5, 10, 5, 25) // or a weird one
+	_ = tensor.Full[int](4, []int{5, 2}) // (value, shape)
 
 	// From a range?
-	_ = tensor.Range[int](0, 100, 2) // (start, end, step)
+	_ = tensor.Range[uint](0, 100, 2) // (start, end, step)
 	// Maybe in reverse?
-	_ = tensor.Range[int](100, 0, -1)
+	_ = tensor.Range[uint](100, 0, -1)
 
 	// Even a geometrical space?
-	_ = tensor.Linspace[int](-10, 10, 5) // (start, end, size)
-	_ = tensor.Logspace[float64](2, 0, 1, 20) // (base, start, end, size)
+	_ = tensor.Linspace[float32](-10, 10, 5) // (start, end, size)
+	_ = tensor.Logspace[float32](2, 0, 1, 20) // (base, start, end, size)
 
 	// Random facilities as well?
-	_ = tensor.Rand[float32](3, 3, 3) // (shape ...int)
-	_ = tensor.RandRange[float32](10, 100, []int{4, 4}) // (start, end, shape)
+	_ = tensor.Rand[float64](3, 3, 3) // (shape ...int)
+	_ = tensor.RandRange[float64](10, 100, []int{4, 4}) // (start, end, shape)
 
 	// In fact Nune can create tensors from (almost) anything.
 	_ = tensor.From[int](5)
 	_ = tensor.From[float32]([]int{1, 2, 3}) // implicitly casts the type
 	_ = tensor.From[float64]("nune") // even strings
 
-	type  Point  int
+	type Point int
 	_ = tensor.From[Point](3) // or custom types
 
 	// It can also take any n-dimensional array/slice.
