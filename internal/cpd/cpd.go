@@ -69,18 +69,19 @@ func Reduct[T nune.Numeric](buf []T, f func([]T) T) T {
 	var wg sync.WaitGroup
 
 	chunk := int(math.Floor(float64(len(buf)) / float64(nCPU)))
+	if chunk == 0 { chunk++ }
 
 	res := struct {
 		sync.RWMutex
 		b []T
 	}{
-		b: make([]T, nCPU),
+		b: make([]T, int(math.Ceil(float64(len(buf)) / float64(chunk)))),
 	}
 
 	var bIdx int
 	for i := 0; i < len(buf); i += chunk {
 		var end int
-		if i+chunk > len(buf) {
+		if i+chunk >= len(buf) {
 			end = len(buf)
 		} else {
 			end = i + chunk
