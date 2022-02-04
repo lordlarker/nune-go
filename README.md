@@ -2,11 +2,11 @@
 **Nu**merical engi**ne** is a library for performing numerical computation in Go, relying on generic tensors.
 
 ## Table of contents
-- [Installation](Installation)
-- [Design](Design)
-- [Usage](Usage)
-- [Roadmap](Roadmap)
-- [License](License)
+- [Installation](#Installation)
+- [Design](#Design)
+- [Usage](#Usage)
+- [Roadmap](#Roadmap)
+- [License](#License)
 
 ## Installation
 **Nune** requires Go v1.18 as it heavily relies on generics in order to achieve a flexible interface.
