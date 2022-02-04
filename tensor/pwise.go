@@ -9,6 +9,14 @@ import (
 	"nune/internal/cpd"
 )
 
+// PwiseOp performs a pointwise operation
+// over each element of the Tensor.
+func (t Tensor[T]) PwiseOp(f func(T) T) Tensor[T] {
+	cpd.Pointwise(t.data, f)
+
+	return t
+}
+
 // Abs computes the absolute value of each
 // element of the Tensor and returns the Tensor.
 func (t Tensor[T]) Abs() Tensor[T] {
