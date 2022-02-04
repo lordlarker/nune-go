@@ -84,10 +84,10 @@ func (t Tensor[T]) Broadable(shape ...int) bool {
 
 	if len(t.shape) < len(shape) {
 		s = slice.WithLen[int](len(shape))
-		for i := 0; i < len(shape) - len(t.shape); i++ {
+		for i := 0; i < len(shape)-len(t.shape); i++ {
 			s[i] = 1
 		}
-		copy(s[len(shape)-len(t.shape)+1:], t.shape)
+		copy(s[len(shape)-len(t.shape):], t.shape)
 	} else {
 		s = t.shape
 	}

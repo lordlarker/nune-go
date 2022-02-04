@@ -5,12 +5,12 @@
 package tensor
 
 import (
-	"nune"
-	"nune/internal/slice"
-	"time"
 	"math"
 	"math/rand"
+	"nune"
+	"nune/internal/slice"
 	"reflect"
+	"time"
 )
 
 // init sets the rand package's rand.Source value to the local time.
@@ -44,15 +44,15 @@ func From[T nune.Numeric](b any) Tensor[T] {
 		d, s := unwrapAnySlice[T](c, []int{len(c)})
 
 		return Tensor[T]{
-			data: d,
-			shape: s,
+			data:    d,
+			shape:   s,
 			strides: stridesFromShape(s),
 		}
 	default:
 		if c, ok := anyToNumeric[T](b); ok {
 			return Tensor[T]{
-				data:  []T{c},
-				shape: nil,
+				data:    []T{c},
+				shape:   nil,
 				strides: nil,
 			}
 		} else if c, ok := anyToTensor[T](b); ok {
@@ -78,8 +78,8 @@ func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data: data,
-		shape: slice.Copy(shape),
+		data:    data,
+		shape:   slice.Copy(shape),
 		strides: stridesFromShape(shape),
 	}
 }
@@ -98,7 +98,7 @@ func Ones[T nune.Numeric](shape ...int) Tensor[T] {
 // and with the given step-size.
 func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 	if step == 0 {
-		panic("nune/tensor: Range received a null step size")	
+		panic("nune/tensor: Range received a null step size")
 	} else if step > 0 && end < start {
 		panic("nune/tensor: Range received a positive step size in a descending interval")
 	} else if step < 0 && end > start {
@@ -110,8 +110,8 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 		end++
 	}
 
-	d := math.Sqrt(math.Pow(float64(end-start), 2)) // distance
-	l := int(math.Floor(d/math.Abs(float64(step)))) // length
+	d := math.Sqrt(math.Pow(float64(end-start), 2))   // distance
+	l := int(math.Floor(d / math.Abs(float64(step)))) // length
 
 	i := 0
 	rng := slice.WithLen[T](l)
@@ -121,8 +121,8 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data: rng,
-		shape: []int{len(rng)},
+		data:    rng,
+		shape:   []int{len(rng)},
 		strides: []int{1},
 	}
 }
@@ -142,8 +142,8 @@ func Rand[T nune.Numeric](shape ...int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data: data,
-		shape: slice.Copy(shape),
+		data:    data,
+		shape:   slice.Copy(shape),
 		strides: stridesFromShape(shape),
 	}
 }
@@ -165,8 +165,8 @@ func Randn[T nune.Numeric](shape ...int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data: data,
-		shape: slice.Copy(shape),
+		data:    data,
+		shape:   slice.Copy(shape),
 		strides: stridesFromShape(shape),
 	}
 }
@@ -189,12 +189,12 @@ func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
 
 	data := slice.WithLen[T](slice.Prod(shape))
 	for i := 0; i < len(data); i++ {
-		data[i] = T(rand.Intn(end-start)+start)
+		data[i] = T(rand.Intn(end-start) + start)
 	}
 
 	return Tensor[T]{
-		data: data,
-		shape: slice.Copy(shape),
+		data:    data,
+		shape:   slice.Copy(shape),
 		strides: stridesFromShape(shape),
 	}
 }
@@ -215,17 +215,18 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 
 	// make sure sizes greater than the interval's size are only
 	// allowed when T is a floating point type.
-	if T(d) / T(size) == 0 {
+	if T(d)/T(size) == 0 {
 		panic("nune: Linspace received a size greater than the interval's size with a non-floating point type")
 	}
 
-	// to avoid dividing be zero when calculating the step-size
-	if size == 1 {
-		size += 1
-	}
+	var x, step T
 
-	x := T(start)
-	step := T(end-start) / T(size-1)
+	x = T(start)
+	if size == 1 {
+		step = T(end-start) / 1
+	} else {
+		step = T(end-start) / T(size-1)
+	}
 
 	data := slice.WithLen[T](size)
 	for i := 0; i < size; i++ {
@@ -234,8 +235,8 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data: data,
-		shape: []int{size},
+		data:    data,
+		shape:   []int{size},
 		strides: []int{1},
 	}
 }
@@ -252,27 +253,28 @@ func Logspace[T nune.Numeric](base, start, end float64, size int) Tensor[T] {
 
 	// make sure sizes greater than the interval's size are only
 	// allowed when T is a floating point type.
-	if T(d) / T(size) == 0 {
+	if T(d)/T(size) == 0 {
 		panic("nune: Logspace received a size greater than the interval's size with a non-floating point type")
 	}
 
-	// to avoid dividing be zero when calculating the step-size
-	if size == 1 {
-		size += 1
-	}
+	var x, step float64
 
-	x := math.Pow(base, start)
-	step := math.Pow(base, (end-start) / float64(size-1))
+	x = math.Pow(base, start)
+	if size == 1 {
+		step = math.Pow(base, (end-start)/1)
+	} else {
+		step = math.Pow(base, (end-start)/float64(size-1))
+	}
 
 	data := slice.WithLen[T](size)
 	for i := 0; i < size; i++ {
 		data[i] = T(x)
 		x *= step
 	}
-	
+
 	return Tensor[T]{
-		data: data,
-		shape: []int{size},
+		data:    data,
+		shape:   []int{size},
 		strides: []int{1},
 	}
 }

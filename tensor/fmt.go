@@ -5,9 +5,9 @@
 package tensor
 
 import (
-	"nune"
 	"fmt"
 	"math"
+	"nune"
 	"reflect"
 	"strings"
 )
@@ -147,16 +147,23 @@ func cfgPad(s string) int {
 func cfgWidth[T nune.Numeric](t Tensor[T]) int {
 	min, max := float64(t.Min()), float64(t.Max()) // find min and max numbers
 	x := T(math.Max(math.Abs(min), math.Abs(max))) // find which has more numbers
+	var l int
 
 	switch reflect.ValueOf(x).Kind() {
 	case reflect.Float32, reflect.Float64:
-		return len(fmt.Sprintf("%.*f", nune.FmtConfig.Precision, float64(x)))
+		l = len(fmt.Sprintf("%.*f", nune.FmtConfig.Precision, float64(x)))
 	case reflect.Uint8:
 		if nune.FmtConfig.Btoa {
-			return 1
+			l = 1
 		}
 		fallthrough
 	default:
-		return len(fmt.Sprintf("%d", int64(min)))
+		l = len(fmt.Sprintf("%d", int64(x)))
 	}
+
+	if min < 0 {
+		l++
+	}
+
+	return l
 }

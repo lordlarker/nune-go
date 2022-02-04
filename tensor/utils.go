@@ -10,7 +10,11 @@ import (
 
 // stridesFromShape returns indexing strides for a given shape.
 func stridesFromShape(shape []int) []int {
-	strides := slice.WithLen[int](len(shape)) 
+	if len(shape) == 0 {
+		return nil
+	}
+
+	strides := slice.WithLen[int](len(shape))
 	strides[0] = slice.Prod(shape[1:])
 
 	for i := 1; i < len(shape); i++ {

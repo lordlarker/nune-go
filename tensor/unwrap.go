@@ -40,7 +40,7 @@ func unwrapAnySlice[T nune.Numeric](n []any, shape []int) ([]T, []int) {
 		for i := 0; i < len(n); i++ {
 			r := reflect.ValueOf(n[i])
 			for j := 0; j < d; j++ {
-				p[i * d + j] = r.Index(j).Interface()
+				p[i*d+j] = r.Index(j).Interface()
 			}
 		}
 

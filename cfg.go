@@ -6,11 +6,11 @@ package nune
 
 // FmtConfig holds Nune's formatting configuration.
 var FmtConfig = struct {
-	Excerpt int // limit of the number of elements formatted
+	Excerpt   int  // limit of the number of elements formatted
 	Precision int  // limit of the number of decimals formatted
-	Btoa bool // convert bytes to ASCII
+	Btoa      bool // convert bytes to ASCII
 }{
-	Excerpt: 6,
+	Excerpt:   6,
 	Precision: 4,
-	Btoa: false,
+	Btoa:      false,
 }
