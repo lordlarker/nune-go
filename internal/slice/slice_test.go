@@ -5,7 +5,7 @@
 package slice_test
 
 import (
-	"nune/internal/slice"
+	"github.com/lordlarker/nune/internal/slice"
 	"testing"
 )
 

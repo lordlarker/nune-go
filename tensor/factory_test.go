@@ -5,7 +5,7 @@
 package tensor_test
 
 import (
-	"nune/tensor"
+	"github.com/lordlarker/nune/tensor"
 	"testing"
 )
 
