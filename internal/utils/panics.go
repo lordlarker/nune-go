@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tensor_test
+package utils
 
-// panics checks if a function panics or not.
-func panics(doesItPanic func()) (panics bool) {
+// Panics checks if a function panics or not.
+func Panics(doesItPanic func()) (panics bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			panics = true

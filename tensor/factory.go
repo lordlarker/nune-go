@@ -58,7 +58,7 @@ func From[T nune.Numeric](b any) Tensor[T] {
 		} else if c, ok := anyToTensor[T](b); ok {
 			return c
 		} else {
-			panic("nune/tensor: From failed to create a Tensor from the given backing")
+			panic(errUnwrapBacking)
 		}
 	}
 }
@@ -66,11 +66,7 @@ func From[T nune.Numeric](b any) Tensor[T] {
 // Full returns a Tensor filled with the given value and
 // satisfying the given shape.
 func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
-	if checkEmptyShape(shape) {
-		panic("nune/tensor: Full received an empty shape")
-	} else if !checkPosAxes(shape) {
-		panic("nune/tensor: Full received a shape with non-strictly positive axes")
-	}
+	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
 	for i := 0; i < len(data); i++ {
@@ -86,29 +82,18 @@ func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
 
 // Zeros returns a Tensor filled with zeros and satisfying the given shape.
 func Zeros[T nune.Numeric](shape ...int) Tensor[T] {
-	return Full[T](0, shape)
+	return Full(T(0), shape)
 }
 
 // Ones returns a Tensor filled with ones and satisfying the given shape.
 func Ones[T nune.Numeric](shape ...int) Tensor[T] {
-	return Full[T](1, shape)
+	return Full(T(1), shape)
 }
 
-// Range returns a rank-1 Tensor on the interval [start, end),
+// Range returns a rank 1 Tensor on the interval [start, end),
 // and with the given step-size.
 func Range[T nune.Numeric](start, end, step int) Tensor[T] {
-	if step == 0 {
-		panic("nune/tensor: Range received a null step size")
-	} else if step > 0 && end < start {
-		panic("nune/tensor: Range received a positive step size in a descending interval")
-	} else if step < 0 && end > start {
-		panic("nune/tensor: Range received a negative step size in an ascending interval")
-	}
-
-	// interval size must be strictly positive
-	if start == end {
-		end++
-	}
+	assertGoodStep(step, start, end)
 
 	d := math.Sqrt(math.Pow(float64(end-start), 2))   // distance
 	l := int(math.Floor(d / math.Abs(float64(step)))) // length
@@ -130,11 +115,7 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 // Rand returns a Tensor filled with random numbers generated
 // from a uniform distribution on the interval [0, 1).
 func Rand[T nune.Numeric](shape ...int) Tensor[T] {
-	if checkEmptyShape(shape) {
-		panic("nune/tensor: Rand received an empty shape")
-	} else if !checkPosAxes(shape) {
-		panic("nune/tensor: Rand received a shape with non-strictly positive axes")
-	}
+	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
 	for i := 0; i < len(data); i++ {
@@ -152,11 +133,7 @@ func Rand[T nune.Numeric](shape ...int) Tensor[T] {
 // from a uniform distribution with mean 0 and variance 1
 // (also known as the standard deviation).
 func Randn[T nune.Numeric](shape ...int) Tensor[T] {
-	if checkEmptyShape(shape) {
-		panic("nune/tensor: Randn received an empty shape")
-	} else if !checkPosAxes(shape) {
-		panic("nune/tensor: Randn received a shape with non-strictly positive axes")
-	}
+	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
 	for i := 0; i < len(data); i++ {
@@ -172,15 +149,11 @@ func Randn[T nune.Numeric](shape ...int) Tensor[T] {
 }
 
 // RandRange returns a tensor filled with random numbers
-// generated uniformly on the interval [start, end).
+// generated uniformly on the ascending interval [start, end).
 func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
-	if start > end {
-		panic("nune/tensor: RandRange received a descending interval")
-	} else if checkEmptyShape(shape) {
-		panic("nune/tensor: RandRange received an empty shape")
-	} else if !checkPosAxes(shape) {
-		panic("nune/tensor: RandRange received a shape with non-strictly positive axes")
-	}
+	assertGoodStep(1, start, end) // make sure the interval is ascending
+	assertGoodInterval(start, end)
+	assertGoodShape(shape...)
 
 	// rand.Intn requires strictly positive arguments
 	if start == end || end == 0 {
@@ -202,35 +175,26 @@ func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
 // Linspace returns a rank-1 Tensor of the given size whose values
 // are evenly spaced on the interval [start, end].
 func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
-	if size <= 0 {
-		panic("nune/tensor: Linspace received a non-strictly positive size")
-	}
+	assertGoodShape(size)
 
-	// interval size must be strictly positive
+	// if interval size is null
 	if start == end {
 		return Full(T(start), []int{size})
 	}
 
-	d := math.Sqrt(math.Pow(float64(end-start), 2)) // distance
+	var x, step float64
 
-	// make sure sizes greater than the interval's size are only
-	// allowed when T is a floating point type.
-	if T(d)/T(size) == 0 {
-		panic("nune: Linspace received a size greater than the interval's size with a non-floating point type")
-	}
-
-	var x, step T
-
-	x = T(start)
+	x = float64(start)
+	// avoid division by zero
 	if size == 1 {
-		step = T(end-start) / 1
+		step = float64(end-start) / 1
 	} else {
-		step = T(end-start) / T(size-1)
+		step = float64(end-start) / float64(size-1)
 	}
 
 	data := slice.WithLen[T](size)
 	for i := 0; i < size; i++ {
-		data[i] = x
+		data[i] = T(x)
 		x += step
 	}
 
@@ -245,21 +209,12 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 // are evenly spaced on the interval
 // [math.Pow(base, start), math.Pow(base, end)].
 func Logspace[T nune.Numeric](base, start, end float64, size int) Tensor[T] {
-	if size <= 0 {
-		panic("nune/tensor: Logspace received a non-strictly positive size")
-	}
-
-	d := math.Sqrt(math.Pow(float64(end-start), 2)) // distance
-
-	// make sure sizes greater than the interval's size are only
-	// allowed when T is a floating point type.
-	if T(d)/T(size) == 0 {
-		panic("nune: Logspace received a size greater than the interval's size with a non-floating point type")
-	}
+	assertGoodShape(size)
 
 	var x, step float64
 
 	x = math.Pow(base, start)
+	// avoid division by zero
 	if size == 1 {
 		step = math.Pow(base, (end-start)/1)
 	} else {

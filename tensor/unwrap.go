@@ -15,7 +15,7 @@ import (
 // into a 1-dimensional contiguous numeric slice.
 func unwrapAnySlice[T nune.Numeric](n []any, shape []int) ([]T, []int) {
 	if len(n) == 0 {
-		panic("nune/tensor: unwrapAnySlice received an empty slice")
+		panic(errUnwrapBacking)
 	}
 
 	if _, ok := anyToNumeric[T](n[0]); ok {
@@ -32,7 +32,7 @@ func unwrapAnySlice[T nune.Numeric](n []any, shape []int) ([]T, []int) {
 
 		for i := 1; i < len(n); i++ {
 			if reflect.ValueOf(n[i]).Len() != d {
-				panic("nune/tensor: unwrapAnySlice received a backing with unequal dimensions along the same axes")
+				panic(errUnwrapBacking)
 			}
 		}
 
@@ -49,40 +49,48 @@ func unwrapAnySlice[T nune.Numeric](n []any, shape []int) ([]T, []int) {
 		return unwrapAnySlice[T](p, shape)
 	}
 
-	panic("nune/tensor: unwrapAnySlice failed to unwrap the backing into a 1-dimensional numeric slice")
+	panic(errUnwrapBacking)
 }
 
 // anyToNumeric attemps to cast an interface{}
 // to the given Numeric type.
 func anyToNumeric[T nune.Numeric](a any) (T, bool) {
-	switch a.(type) {
-	case int:
-		return T(a.(int)), true
-	case int8:
-		return T(a.(int8)), true
-	case int16:
-		return T(a.(int16)), true
-	case int32:
-		return T(a.(int32)), true
-	case int64:
-		return T(a.(int64)), true
-	case uint:
-		return T(a.(uint)), true
-	case uint8:
-		return T(a.(uint8)), true
-	case uint16:
-		return T(a.(uint16)), true
-	case uint32:
-		return T(a.(uint32)), true
-	case uint64:
-		return T(a.(uint64)), true
-	case float32:
-		return T(a.(float32)), true
-	case float64:
-		return T(a.(float64)), true
+	switch k := a.(type) {
 	default:
-		return T(0), false
+		if v, ok := k.(T); ok {
+			return v, true
+		} else {
+			return T(0), false
+		}
 	}
+	// switch a.(type) {
+	// case int:
+	// 	return T(a.(int)), true
+	// case int8:
+	// 	return T(a.(int8)), true
+	// case int16:
+	// 	return T(a.(int16)), true
+	// case int32:
+	// 	return T(a.(int32)), true
+	// case int64:
+	// 	return T(a.(int64)), true
+	// case uint:
+	// 	return T(a.(uint)), true
+	// case uint8:
+	// 	return T(a.(uint8)), true
+	// case uint16:
+	// 	return T(a.(uint16)), true
+	// case uint32:
+	// 	return T(a.(uint32)), true
+	// case uint64:
+	// 	return T(a.(uint64)), true
+	// case float32:
+	// 	return T(a.(float32)), true
+	// case float64:
+	// 	return T(a.(float64)), true
+	// default:
+	// 	return T(0), false
+	// }
 }
 
 // anyToTensor attempts to cast an interface{}

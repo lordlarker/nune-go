@@ -6,6 +6,7 @@ package tensor
 
 import (
 	"github.com/lordlarker/nune/internal/slice"
+	"github.com/lordlarker/nune/internal/utils"
 	"unsafe"
 )
 
@@ -46,16 +47,14 @@ func (t Tensor[T]) Strides() []int {
 // If axis is specified, the number of dimensions at
 // that axis is returned.
 func (t Tensor[T]) Size(axis ...int) int {
-	if len(axis) == 0 {
+	args := len(axis)
+	assertArgsBounds(args, 1)
+
+	if args == 0 {
 		return slice.Prod(t.shape)
-	} else if len(axis) == 1 {
-		if axis := axis[0]; checkInRange(axis, 0, len(t.shape)) {
-			return t.shape[axis]
-		} else {
-			panic("nune/tensor: Size received an out of bounds axis")
-		}
 	} else {
-		panic("nune/tensor: Size received more than 1 axis")
+		assertAxisBounds(axis[0], t.Rank())
+		return t.shape[axis[0]]
 	}
 }
 
@@ -72,11 +71,10 @@ func (t Tensor[T]) MemSize() uintptr {
 // Broadable returns whether or not the Tensor can be
 // broadcasted to the given shape.
 func (t Tensor[T]) Broadable(shape ...int) bool {
-	if checkEmptyShape(shape) {
-		return false
-	} else if len(t.shape) > len(shape) {
-		return false
-	} else if !checkPosAxes(shape) {
+	if utils.Panics(func() {
+		assertGoodShape(shape...)
+		assertArgsBounds(len(shape), t.Rank()-1)
+	}) {
 		return false
 	}
 

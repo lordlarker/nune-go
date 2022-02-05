@@ -57,13 +57,8 @@ func (t Tensor[T]) Reshape(s ...int) Tensor[T] {
 	if len(s) == 0 && len(t.data) <= 1 {
 		t.shape = nil
 	} else {
-		if checkEmptyShape(s) {
-			panic("nune/tensor: Tensor.Reshape received an empty shape")
-		} else if !checkPosAxes(s) {
-			panic("nune/tensor: Tensor.Reshape received a shape with non-strictly positive axes")
-		} else if len(t.data) != slice.Prod(s) {
-			panic("nune/tensor: Tensor.Reshape received a shape whose size doesn't match the Tensor's number of elements")
-		}
+		assertGoodShape(s...)
+		assertArgsBounds(len(s), t.Rank()-1)
 
 		t.shape = slice.Copy(s)
 		t.strides = stridesFromShape(t.shape)
@@ -73,14 +68,10 @@ func (t Tensor[T]) Reshape(s ...int) Tensor[T] {
 
 // Index returns a view over an index of the Tensor.
 func (t Tensor[T]) Index(indices ...int) Tensor[T] {
-	if len(indices) > len(t.shape) {
-		panic("nune/tensor: Tensor.Index received more indices than its number of axes")
-	}
+	assertArgsBounds(len(indices), t.Rank()-1)
 
 	for i, idx := range indices {
-		if !checkInRange(idx, 0, t.shape[i]) {
-			panic("nune/tensor: Tensor.Index received an out of bounds index")
-		}
+		assertAxisBounds(idx, t.shape[i])
 	}
 
 	var offset int
@@ -98,15 +89,8 @@ func (t Tensor[T]) Index(indices ...int) Tensor[T] {
 
 // Slice returns a view over a slice of the Tensor.
 func (t *Tensor[T]) Slice(start, end int) Tensor[T] {
-	if len(t.shape) == 0 {
-		panic("nune/tensor: Tensor.Slice cannot slice rank 0 Tensor")
-	} else if start < 0 {
-		panic("nune/tensor: Tensor.Slice received an endpoint less than zero")
-	} else if start > end {
-		panic("nune/tensor: Tensor.Slice received a descending interval")
-	} else if end > t.Size(0) {
-		panic("nune/tensor: Tensor.Slice received an endpoint greater than the Tensor's size at axis 0")
-	}
+	assertGoodShape(t.shape...) // make sure Tensor rank is not 0
+	assertGoodInterval(start, end, [2]int{0, t.Size(0)})
 
 	newshape := slice.WithLen[int](len(t.shape))
 	newshape[0] = end - start
