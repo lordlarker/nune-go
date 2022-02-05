@@ -4,6 +4,11 @@
 
 package tensor
 
+// List of errors.
+var (
+	
+)
+
 // checkEmptyShape returns true if the given
 // shape s is empty and false otherwise.
 func checkEmptyShape(s []int) bool {

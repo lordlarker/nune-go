@@ -5,7 +5,7 @@
 package tensor
 
 import (
-	"nune/internal/slice"
+	"github.com/lordlarker/nune/internal/slice"
 	"unsafe"
 )
 

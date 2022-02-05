@@ -5,7 +5,7 @@
 package tensor
 
 import (
-	"nune/internal/cpd"
+	"github.com/lordlarker/nune/internal/cpd"
 )
 
 func (t Tensor[T]) ReductOp(f func([]T) T) T {

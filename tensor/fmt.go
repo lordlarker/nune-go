@@ -7,7 +7,7 @@ package tensor
 import (
 	"fmt"
 	"math"
-	"nune"
+	"github.com/lordlarker/nune"
 	"reflect"
 	"strings"
 )

@@ -7,8 +7,8 @@ package tensor
 import (
 	"math"
 	"math/rand"
-	"nune"
-	"nune/internal/slice"
+	"github.com/lordlarker/nune"
+	"github.com/lordlarker/nune/internal/slice"
 	"reflect"
 	"time"
 )

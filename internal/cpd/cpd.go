@@ -6,7 +6,7 @@ package cpd
 
 import (
 	"math"
-	"nune"
+	"github.com/lordlarker/nune"
 	"runtime"
 	"sync"
 )

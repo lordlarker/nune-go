@@ -5,8 +5,8 @@
 package tensor
 
 import (
-	"nune/internal/cpd"
-	"nune/internal/slice"
+	"github.com/lordlarker/nune/internal/cpd"
+	"github.com/lordlarker/nune/internal/slice"
 )
 
 // Add takes a Tensor and performs element-wise addition,

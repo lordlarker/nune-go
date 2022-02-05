@@ -4,7 +4,7 @@
 
 package tensor
 
-import "nune"
+import "github.com/lordlarker/nune"
 
 // A Tensor is a generic, n-dimensional numerical type.
 type Tensor[T nune.Numeric] struct {

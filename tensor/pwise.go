@@ -6,7 +6,7 @@ package tensor
 
 import (
 	"math"
-	"nune/internal/cpd"
+	"github.com/lordlarker/nune/internal/cpd"
 )
 
 // PwiseOp performs a pointwise operation

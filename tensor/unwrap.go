@@ -5,8 +5,8 @@
 package tensor
 
 import (
-	"nune"
-	"nune/internal/slice"
+	"github.com/lordlarker/nune"
+	"github.com/lordlarker/nune/internal/slice"
 	"reflect"
 )
 
