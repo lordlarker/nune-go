@@ -36,7 +36,7 @@ func (t Tensor[T]) Copy() Tensor[T] {
 func (t Tensor[T]) Assign(v any) Tensor[T] {
 	defer func() {
 		if r := recover(); r != nil {
-			panic("nune/tensor: Tensor.AssignTo could not assign the Tensor's data buffer to the given value")
+			panic(errStorageDump)
 		}
 	}()
 

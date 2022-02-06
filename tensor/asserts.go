@@ -33,6 +33,10 @@ var (
 	// errArgsBounds occurs when a function receives more arguments
 	// than it should.
 	errArgsBounds = errors.New("nune: received more arguments than allowed")
+
+	// errStorageDump occurs when the Assign method fails to dump
+	// the given data to the Tensor's storage.
+	errStorageDump = errors.New("nune: could not dump data buffer to storage")
 )
 
 // assertGoodShape makes sure a shape isn't empty,
