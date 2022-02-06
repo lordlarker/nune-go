@@ -8,12 +8,12 @@ import (
 	"github.com/lordlarker/nune/internal/cpd"
 )
 
-func (t Tensor[T]) ReductOp(f func([]T) T) T {
+func (t *Tensor[T]) ReductOp(f func([]T) T) T {
 	return cpd.Reduct(t.storage.Load(), f)
 }
 
 // Min returns the minimum value of all elements in the Tensor.
-func (t Tensor[T]) Min() T {
+func (t *Tensor[T]) Min() T {
 	return t.ReductOp(func(s []T) T {
 		m := s[0]
 		for i := 1; i < len(s); i++ {
@@ -26,7 +26,7 @@ func (t Tensor[T]) Min() T {
 }
 
 // Max returns the maximum value of all elements in the Tensor.
-func (t Tensor[T]) Max() T {
+func (t *Tensor[T]) Max() T {
 	return t.ReductOp(func(s []T) T {
 		m := s[0]
 		for i := 1; i < len(s); i++ {
@@ -39,10 +39,10 @@ func (t Tensor[T]) Max() T {
 }
 
 // Mean returns the mean value of all elements in the Tensor.
-func (t Tensor[T]) Mean() T {
+func (t *Tensor[T]) Mean() T {
 	return t.ReductOp(func(s []T) T {
 		var sum T
-		for i := 1; i < len(s); i++ {
+		for i := 0; i < len(s); i++ {
 			sum += s[i]
 		}
 		return sum / T(len(s))
@@ -50,10 +50,10 @@ func (t Tensor[T]) Mean() T {
 }
 
 // Sum returns the sum of all elements in the Tensor.
-func (t Tensor[T]) Sum() T {
+func (t *Tensor[T]) Sum() T {
 	return t.ReductOp(func(s []T) T {
 		var sum T
-		for i := 1; i < len(s); i++ {
+		for i := 0; i < len(s); i++ {
 			sum += s[i]
 		}
 		return sum
@@ -61,10 +61,10 @@ func (t Tensor[T]) Sum() T {
 }
 
 // Prod returns the product of all elements in the Tensor.
-func (t Tensor[T]) Prod() T {
+func (t *Tensor[T]) Prod() T {
 	return t.ReductOp(func(s []T) T {
 		var prod T = 1
-		for i := 1; i < len(s); i++ {
+		for i := 0; i < len(s); i++ {
 			prod *= s[i]
 		}
 		return prod

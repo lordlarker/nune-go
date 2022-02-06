@@ -107,33 +107,33 @@ func numericToNumeric[T, U nune.Numeric](s []any) []T {
 
 // anyToTensor attempts to cast an interface{}
 // to a Tensor of the given numeric type.
-func anyToTensor[T nune.Numeric](a any) (Tensor[T], bool) {
+func anyToTensor[T nune.Numeric](a any) (*Tensor[T], bool) {
 	switch a.(type) {
 	case Tensor[int]:
-		return Cast[T](a.(Tensor[int])), true
+		return Cast[T](a.(*Tensor[int])), true
 	case Tensor[int8]:
-		return Cast[T](a.(Tensor[int8])), true
+		return Cast[T](a.(*Tensor[int8])), true
 	case Tensor[int16]:
-		return Cast[T](a.(Tensor[int16])), true
+		return Cast[T](a.(*Tensor[int16])), true
 	case Tensor[int32]:
-		return Cast[T](a.(Tensor[int32])), true
+		return Cast[T](a.(*Tensor[int32])), true
 	case Tensor[int64]:
-		return Cast[T](a.(Tensor[int64])), true
+		return Cast[T](a.(*Tensor[int64])), true
 	case Tensor[uint]:
-		return Cast[T](a.(Tensor[uint])), true
+		return Cast[T](a.(*Tensor[uint])), true
 	case Tensor[uint8]:
-		return Cast[T](a.(Tensor[uint8])), true
+		return Cast[T](a.(*Tensor[uint8])), true
 	case Tensor[uint16]:
-		return Cast[T](a.(Tensor[uint16])), true
+		return Cast[T](a.(*Tensor[uint16])), true
 	case Tensor[uint32]:
-		return Cast[T](a.(Tensor[uint32])), true
+		return Cast[T](a.(*Tensor[uint32])), true
 	case Tensor[uint64]:
-		return Cast[T](a.(Tensor[uint64])), true
+		return Cast[T](a.(*Tensor[uint64])), true
 	case Tensor[float32]:
-		return Cast[T](a.(Tensor[float32])), true
+		return Cast[T](a.(*Tensor[float32])), true
 	case Tensor[float64]:
-		return Cast[T](a.(Tensor[float64])), true
+		return Cast[T](a.(*Tensor[float64])), true
 	default:
-		return Tensor[T]{}, false
+		return &Tensor[T]{}, false
 	}
 }

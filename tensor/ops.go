@@ -12,7 +12,7 @@ import (
 // Add takes a Tensor and performs element-wise addition,
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
-func (t Tensor[T]) Add(other Tensor[T]) Tensor[T] {
+func (t *Tensor[T]) Add(other *Tensor[T]) *Tensor[T] {
 	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Add received a Tensor with a different shape than its own")
 	}
@@ -27,7 +27,7 @@ func (t Tensor[T]) Add(other Tensor[T]) Tensor[T] {
 // Sub takes a Tensor and performs element-wise subtraction,
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
-func (t Tensor[T]) Sub(other Tensor[T]) Tensor[T] {
+func (t *Tensor[T]) Sub(other *Tensor[T]) *Tensor[T] {
 	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Sub received a Tensor with a different shape than its own")
 	}
@@ -42,7 +42,7 @@ func (t Tensor[T]) Sub(other Tensor[T]) Tensor[T] {
 // Mul takes a Tensor and performs element-wise multiplication,
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
-func (t Tensor[T]) Mul(other Tensor[T]) Tensor[T] {
+func (t *Tensor[T]) Mul(other *Tensor[T]) *Tensor[T] {
 	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Mul received a Tensor with a different shape than its own")
 	}
@@ -57,7 +57,7 @@ func (t Tensor[T]) Mul(other Tensor[T]) Tensor[T] {
 // Div takes a Tensor and performs element-wise division,
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
-func (t Tensor[T]) Div(other Tensor[T]) Tensor[T] {
+func (t *Tensor[T]) Div(other *Tensor[T]) *Tensor[T] {
 	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Div received a Tensor with a different shape than its own")
 	}

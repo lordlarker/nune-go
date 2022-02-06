@@ -29,7 +29,7 @@ func Seed(seed int64) {
 //
 // TODO: optimize the hell out of this function and
 // its helper functions.
-func From[T nune.Numeric](b any) Tensor[T] {
+func From[T nune.Numeric](b any) *Tensor[T] {
 	switch k := reflect.TypeOf(b).Kind(); k {
 	case reflect.String:
 		b = any([]byte(b.(string)))
@@ -44,13 +44,13 @@ func From[T nune.Numeric](b any) Tensor[T] {
 
 		d, s := unwrapAny[T](c, []int{len(c)})
 
-		return Tensor[T]{
+		return &Tensor[T]{
 			storage: newStorage(d),
 			layout:  newLayout(s),
 		}
 	default:
 		if anyIsNumeric(b) {
-			return Tensor[T]{
+			return &Tensor[T]{
 				storage: newStorage(anyToNumeric[T](b)),
 				layout:  newLayout(nil),
 			}
@@ -64,7 +64,7 @@ func From[T nune.Numeric](b any) Tensor[T] {
 
 // Full returns a Tensor filled with the given value and
 // satisfying the given shape.
-func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
+func Full[T nune.Numeric](x T, shape []int) *Tensor[T] {
 	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
@@ -72,25 +72,25 @@ func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
 		data[i] = T(x)
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout(slice.Copy(shape)),
 	}
 }
 
 // Zeros returns a Tensor filled with zeros and satisfying the given shape.
-func Zeros[T nune.Numeric](shape ...int) Tensor[T] {
+func Zeros[T nune.Numeric](shape ...int) *Tensor[T] {
 	return Full(T(0), shape)
 }
 
 // Ones returns a Tensor filled with ones and satisfying the given shape.
-func Ones[T nune.Numeric](shape ...int) Tensor[T] {
+func Ones[T nune.Numeric](shape ...int) *Tensor[T] {
 	return Full(T(1), shape)
 }
 
 // Range returns a rank 1 Tensor on the interval [start, end),
 // and with the given step-size.
-func Range[T nune.Numeric](start, end, step int) Tensor[T] {
+func Range[T nune.Numeric](start, end, step int) *Tensor[T] {
 	assertGoodStep(step, start, end)
 
 	d := math.Sqrt(math.Pow(float64(end-start), 2))   // distance
@@ -103,7 +103,7 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 		i++
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(rng),
 		layout:  newLayout([]int{len(rng)}),
 	}
@@ -111,7 +111,7 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 
 // Rand returns a Tensor filled with random numbers generated
 // from a uniform distribution on the interval [0, 1).
-func Rand[T nune.Numeric](shape ...int) Tensor[T] {
+func Rand[T nune.Numeric](shape ...int) *Tensor[T] {
 	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
@@ -119,7 +119,7 @@ func Rand[T nune.Numeric](shape ...int) Tensor[T] {
 		data[i] = T(rand.Float64())
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout(slice.Copy(shape)),
 	}
@@ -128,7 +128,7 @@ func Rand[T nune.Numeric](shape ...int) Tensor[T] {
 // Randn returns a Tensor filled with random numbers generated
 // from a uniform distribution with mean 0 and variance 1
 // (also known as the standard deviation).
-func Randn[T nune.Numeric](shape ...int) Tensor[T] {
+func Randn[T nune.Numeric](shape ...int) *Tensor[T] {
 	assertGoodShape(shape...)
 
 	data := slice.WithLen[T](slice.Prod(shape))
@@ -137,7 +137,7 @@ func Randn[T nune.Numeric](shape ...int) Tensor[T] {
 
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout(slice.Copy(shape)),
 	}
@@ -145,7 +145,7 @@ func Randn[T nune.Numeric](shape ...int) Tensor[T] {
 
 // RandRange returns a tensor filled with random numbers
 // generated uniformly on the ascending interval [start, end).
-func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
+func RandRange[T nune.Numeric](start, end int, shape []int) *Tensor[T] {
 	assertGoodStep(1, start, end) // make sure the interval is ascending
 	assertGoodInterval(start, end)
 	assertGoodShape(shape...)
@@ -160,7 +160,7 @@ func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
 		data[i] = T(rand.Intn(end-start) + start)
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout(slice.Copy(shape)),
 	}
@@ -168,7 +168,7 @@ func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
 
 // Linspace returns a rank-1 Tensor of the given size whose values
 // are evenly spaced on the interval [start, end].
-func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
+func Linspace[T nune.Numeric](start, end, size int) *Tensor[T] {
 	assertGoodShape(size)
 
 	// if interval size is null
@@ -192,7 +192,7 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 		x += step
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout([]int{size}),
 	}
@@ -201,7 +201,7 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 // Logspace returns a rank-1 Tensor of the given size whose values
 // are evenly spaced on the interval
 // [math.Pow(base, start), math.Pow(base, end)].
-func Logspace[T nune.Numeric](base, start, end float64, size int) Tensor[T] {
+func Logspace[T nune.Numeric](base, start, end float64, size int) *Tensor[T] {
 	assertGoodShape(size)
 
 	var x, step float64
@@ -220,7 +220,7 @@ func Logspace[T nune.Numeric](base, start, end float64, size int) Tensor[T] {
 		x *= step
 	}
 
-	return Tensor[T]{
+	return &Tensor[T]{
 		storage: newStorage(data),
 		layout:  newLayout([]int{size}),
 	}

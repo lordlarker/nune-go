@@ -14,7 +14,7 @@ import (
 )
 
 // String returns a string representation of the Tensor.
-func (t Tensor[T]) String() string {
+func (t *Tensor[T]) String() string {
 	template := "Tensor({})"
 	f := newFmtState(template, t)
 
@@ -24,7 +24,7 @@ func (t Tensor[T]) String() string {
 }
 
 // fmtTensor formats the Tensor into a string.
-func fmtTensor[T nune.Numeric](t Tensor[T], s fmtState) string {
+func fmtTensor[T nune.Numeric](t *Tensor[T], s fmtState) string {
 	var b strings.Builder
 
 	if t.Rank() == 0 {
@@ -61,7 +61,7 @@ func fmtNum[T nune.Numeric](x T, s fmtState) string {
 
 // fmtExcerpted formats an excerpted representation of
 // a Tensor into a string.
-func fmtExcerpted[T nune.Numeric](t Tensor[T], s fmtState) string {
+func fmtExcerpted[T nune.Numeric](t *Tensor[T], s fmtState) string {
 	var b strings.Builder
 
 	var f string
@@ -88,7 +88,7 @@ func fmtExcerpted[T nune.Numeric](t Tensor[T], s fmtState) string {
 
 // fmtComplete formats a complete representation of
 // a Tensor into a string.
-func fmtComplete[T nune.Numeric](t Tensor[T], s fmtState) string {
+func fmtComplete[T nune.Numeric](t *Tensor[T], s fmtState) string {
 	var b strings.Builder
 
 	for i := 0; i < t.Size(0); i++ {
@@ -127,7 +127,7 @@ func (f fmtState) update() fmtState {
 
 // newFmtState returns a new fmtState configured to
 // a base Tensor representation.
-func newFmtState[T nune.Numeric](fmt string, t Tensor[T]) fmtState {
+func newFmtState[T nune.Numeric](fmt string, t *Tensor[T]) fmtState {
 	s := fmtState{
 		depth: 0,
 		esc:   t.Rank() - 1,
@@ -145,7 +145,7 @@ func cfgPad(s string) int {
 }
 
 // cfgWidth configures the numeric types' width from a given Tensor.
-func cfgWidth[T nune.Numeric](t Tensor[T]) int {
+func cfgWidth[T nune.Numeric](t *Tensor[T]) int {
 	min, max := float64(t.Min()), float64(t.Max()) // find min and max numbers
 	x := T(math.Max(math.Abs(min), math.Abs(max))) // find which has more numbers
 	var l int

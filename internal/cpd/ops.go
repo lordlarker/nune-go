@@ -67,43 +67,31 @@ func Op[T nune.Numeric](buf1, buf2, res []T, f func(T, T) T) {
 }
 
 func Reduct[T nune.Numeric](buf []T, f func([]T) T) T {
+	nChunks := int(math.Ceil(float64(len(buf))/float64(nCPU)))
+
 	var wg sync.WaitGroup
 
-	chunk := int(math.Floor(float64(len(buf)) / float64(nCPU)))
-	if chunk == 0 {
-		chunk++
-	}
+	res := make([]T, 0, nChunks)
+	ch := make(chan T, nChunks)
 
-	res := struct {
-		sync.RWMutex
-		b []T
-	}{
-		b: make([]T, int(math.Ceil(float64(len(buf))/float64(chunk)))),
-	}
-
-	var bIdx int
-	for i := 0; i < len(buf); i += chunk {
-		var end int
-		if i+chunk >= len(buf) {
-			end = len(buf)
-		} else {
-			end = i + chunk
-		}
-
-		go func(s []T, idx int) {
-			y := f(s)
-
-			res.Lock()
-			res.b[idx] = y
-			res.Unlock()
-
-			wg.Done()
-		}(buf[i:end], bIdx)
+	for i := 0; i < nChunks; i++ {
+    	min := (i * len(buf) / nChunks)
+		max := ((i + 1) * len(buf)) / nChunks
 
 		wg.Add(1)
-		bIdx++
-	}
-	wg.Wait()
+		go func(s []T, c chan T) {
+			c <- f(s)
 
-	return f(res.b)
+			wg.Done()
+		}(buf[min:max], ch)
+	}
+
+	wg.Wait()
+	close(ch)
+
+	for v := range ch {
+		res = append(res, v)
+	}
+
+	return f(res)
 }
