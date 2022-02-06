@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,10 +7,11 @@ package tensor
 import (
 	"math"
 	"math/rand"
-	"github.com/lordlarker/nune"
-	"github.com/lordlarker/nune/internal/slice"
 	"reflect"
 	"time"
+
+	"github.com/lordlarker/nune"
+	"github.com/lordlarker/nune/internal/slice"
 )
 
 // init sets the rand package's rand.Source value to the local time.
@@ -41,19 +42,17 @@ func From[T nune.Numeric](b any) Tensor[T] {
 			c[i] = v.Index(i).Interface()
 		}
 
-		d, s := unwrapAnySlice[T](c, []int{len(c)})
+		d, s := unwrapAny[T](c, []int{len(c)})
 
 		return Tensor[T]{
-			data:    d,
-			shape:   s,
-			strides: stridesFromShape(s),
+			storage: newStorage(d),
+			layout:  newLayout(s),
 		}
 	default:
-		if c, ok := anyToNumeric[T](b); ok {
+		if anyIsNumeric(b) {
 			return Tensor[T]{
-				data:    []T{c},
-				shape:   nil,
-				strides: nil,
+				storage: newStorage(anyToNumeric[T](b)),
+				layout:  newLayout(nil),
 			}
 		} else if c, ok := anyToTensor[T](b); ok {
 			return c
@@ -74,9 +73,8 @@ func Full[T nune.Numeric](x T, shape []int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   slice.Copy(shape),
-		strides: stridesFromShape(shape),
+		storage: newStorage(data),
+		layout:  newLayout(slice.Copy(shape)),
 	}
 }
 
@@ -106,9 +104,8 @@ func Range[T nune.Numeric](start, end, step int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    rng,
-		shape:   []int{len(rng)},
-		strides: []int{1},
+		storage: newStorage(rng),
+		layout:  newLayout([]int{len(rng)}),
 	}
 }
 
@@ -123,9 +120,8 @@ func Rand[T nune.Numeric](shape ...int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   slice.Copy(shape),
-		strides: stridesFromShape(shape),
+		storage: newStorage(data),
+		layout:  newLayout(slice.Copy(shape)),
 	}
 }
 
@@ -142,9 +138,8 @@ func Randn[T nune.Numeric](shape ...int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   slice.Copy(shape),
-		strides: stridesFromShape(shape),
+		storage: newStorage(data),
+		layout:  newLayout(slice.Copy(shape)),
 	}
 }
 
@@ -166,9 +161,8 @@ func RandRange[T nune.Numeric](start, end int, shape []int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   slice.Copy(shape),
-		strides: stridesFromShape(shape),
+		storage: newStorage(data),
+		layout:  newLayout(slice.Copy(shape)),
 	}
 }
 
@@ -199,9 +193,8 @@ func Linspace[T nune.Numeric](start, end, size int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   []int{size},
-		strides: []int{1},
+		storage: newStorage(data),
+		layout:  newLayout([]int{size}),
 	}
 }
 
@@ -228,8 +221,7 @@ func Logspace[T nune.Numeric](base, start, end float64, size int) Tensor[T] {
 	}
 
 	return Tensor[T]{
-		data:    data,
-		shape:   []int{size},
-		strides: []int{1},
+		storage: newStorage(data),
+		layout:  newLayout([]int{size}),
 	}
 }

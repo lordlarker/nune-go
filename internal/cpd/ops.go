@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -6,9 +6,10 @@ package cpd
 
 import (
 	"math"
-	"github.com/lordlarker/nune"
 	"runtime"
 	"sync"
+
+	"github.com/lordlarker/nune"
 )
 
 var nCPU = runtime.NumCPU()
@@ -69,13 +70,15 @@ func Reduct[T nune.Numeric](buf []T, f func([]T) T) T {
 	var wg sync.WaitGroup
 
 	chunk := int(math.Floor(float64(len(buf)) / float64(nCPU)))
-	if chunk == 0 { chunk++ }
+	if chunk == 0 {
+		chunk++
+	}
 
 	res := struct {
 		sync.RWMutex
 		b []T
 	}{
-		b: make([]T, int(math.Ceil(float64(len(buf)) / float64(chunk)))),
+		b: make([]T, int(math.Ceil(float64(len(buf))/float64(chunk)))),
 	}
 
 	var bIdx int

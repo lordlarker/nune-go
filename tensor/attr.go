@@ -1,46 +1,46 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package tensor
 
 import (
+	"unsafe"
+
 	"github.com/lordlarker/nune/internal/slice"
 	"github.com/lordlarker/nune/internal/utils"
-	"unsafe"
 )
 
 // Ravel returns a copy of the Tensor's 1-dimensional data buffer.
 func (t Tensor[T]) Ravel() []T {
-	return slice.Copy(t.data)
+	return t.storage.Load()
 }
 
 // Numel returns the number of elements in the Tensor's data buffer.
 func (t Tensor[T]) Numel() int {
-	return len(t.data)
+	return t.storage.Numel()
 }
 
 // Numby returns the size in bytes occupied by all elements
 // of the Tensor's underlying data buffer.
 func (t Tensor[T]) Numby() uintptr {
-	var n T
-	return unsafe.Sizeof(n) * uintptr(len(t.data))
+	return t.storage.Numby()
 }
 
 // Rank returns the Tensor's rank
 // (the number of axes in the Tensor's shape).
 func (t Tensor[T]) Rank() int {
-	return len(t.shape)
+	return t.layout.Rank()
 }
 
 // Shape returns a copy of the Tensor's shape.
 func (t Tensor[T]) Shape() []int {
-	return slice.Copy(t.shape)
+	return slice.Copy(t.layout.Shape())
 }
 
 // Strides returns a copy of the Tensor's strides.
 func (t Tensor[T]) Strides() []int {
-	return slice.Copy(t.strides)
+	return slice.Copy(t.layout.Strides())
 }
 
 // Size returns the Tensor's total shape size.
@@ -51,10 +51,10 @@ func (t Tensor[T]) Size(axis ...int) int {
 	assertArgsBounds(args, 1)
 
 	if args == 0 {
-		return slice.Prod(t.shape)
+		return slice.Prod(t.Shape())
 	} else {
 		assertAxisBounds(axis[0], t.Rank())
-		return t.shape[axis[0]]
+		return t.Shape()[axis[0]]
 	}
 }
 
@@ -62,8 +62,8 @@ func (t Tensor[T]) Size(axis ...int) int {
 // that make up the Tensor.
 func (t Tensor[T]) MemSize() uintptr {
 	var i int
-	shapeSize := unsafe.Sizeof(i) * uintptr(len(t.shape))
-	stridesSize := unsafe.Sizeof(i) * uintptr(len(t.strides))
+	shapeSize := unsafe.Sizeof(i) * uintptr(t.Rank())
+	stridesSize := unsafe.Sizeof(i) * uintptr(t.Rank())
 
 	return t.Numby() + shapeSize + stridesSize
 }
@@ -80,14 +80,14 @@ func (t Tensor[T]) Broadable(shape ...int) bool {
 
 	var s []int
 
-	if len(t.shape) < len(shape) {
+	if t.Rank() < len(shape) {
 		s = slice.WithLen[int](len(shape))
-		for i := 0; i < len(shape)-len(t.shape); i++ {
+		for i := 0; i < len(shape)-t.Rank(); i++ {
 			s[i] = 1
 		}
-		copy(s[len(shape)-len(t.shape):], t.shape)
+		copy(s[len(shape)-t.Rank():], t.Shape())
 	} else {
-		s = t.shape
+		s = t.Shape()
 	}
 
 	for i := 0; i < len(shape); i++ {

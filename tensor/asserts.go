@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -63,7 +63,7 @@ func assertAxisBounds(axis, rank int) {
 func assertGoodStep(s, start, end int) {
 	if s == 0 {
 		panic(errBadStep)
-	} else if s > 0 && end < start || s < 0 && end > start{
+	} else if s > 0 && end < start || s < 0 && end > start {
 		panic(errBadStep)
 	}
 }
@@ -77,7 +77,7 @@ func assertGoodInterval(start, end int, limits ...[2]int) {
 	if start >= end {
 		panic(errBadInterval)
 	}
-	
+
 	if len(limits) == 1 {
 		if start < limits[0][0] || end > limits[0][1] {
 			panic(errBadInterval)

@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -7,9 +7,10 @@ package tensor
 import (
 	"fmt"
 	"math"
-	"github.com/lordlarker/nune"
 	"reflect"
 	"strings"
+
+	"github.com/lordlarker/nune"
 )
 
 // String returns a string representation of the Tensor.
@@ -26,12 +27,12 @@ func (t Tensor[T]) String() string {
 func fmtTensor[T nune.Numeric](t Tensor[T], s fmtState) string {
 	var b strings.Builder
 
-	if len(t.shape) == 0 {
-		b.WriteString(fmtNum(t.data[0], s))
+	if t.Rank() == 0 {
+		b.WriteString(fmtNum(t.storage.Index(0), s))
 	} else {
 		b.WriteString("[")
 
-		if t.shape[0] > nune.FmtConfig.Excerpt {
+		if t.Size(0) > nune.FmtConfig.Excerpt {
 			b.WriteString(fmtExcerpted(t, s))
 		} else {
 			b.WriteString(fmtComplete(t, s))
@@ -69,7 +70,7 @@ func fmtExcerpted[T nune.Numeric](t Tensor[T], s fmtState) string {
 	f = f[1 : len(f)-1]
 	b.WriteString(f)
 
-	if len(t.shape) == 1 {
+	if t.Rank() == 1 {
 		b.WriteString(", ..., ")
 	} else {
 		b.WriteString("\n")
@@ -78,7 +79,7 @@ func fmtExcerpted[T nune.Numeric](t Tensor[T], s fmtState) string {
 		b.WriteString(strings.Repeat(" ", s.pad+1))
 	}
 
-	f = fmtTensor(t.Slice(t.shape[0]-nune.FmtConfig.Excerpt/2, t.shape[0]), s)
+	f = fmtTensor(t.Slice(t.Size(0)-nune.FmtConfig.Excerpt/2, t.Size(0)), s)
 	f = f[1 : len(f)-1]
 	b.WriteString(f)
 
@@ -90,17 +91,17 @@ func fmtExcerpted[T nune.Numeric](t Tensor[T], s fmtState) string {
 func fmtComplete[T nune.Numeric](t Tensor[T], s fmtState) string {
 	var b strings.Builder
 
-	for i := 0; i < t.shape[0]; i++ {
-		if len(t.shape) == 1 {
+	for i := 0; i < t.Size(0); i++ {
+		if t.Rank() == 1 {
 			b.WriteString(fmtTensor(t.Index(i), s))
 
-			if i < t.shape[0]-1 {
+			if i < t.Size(0)-1 {
 				b.WriteString(", ")
 			}
 		} else {
 			b.WriteString(fmtTensor(t.Index(i), s.update()))
 
-			if i < t.shape[0]-1 {
+			if i < t.Size(0)-1 {
 				b.WriteString(strings.Repeat("\n", s.esc))
 				b.WriteString(strings.Repeat(" ", s.pad+1))
 			}
@@ -129,7 +130,7 @@ func (f fmtState) update() fmtState {
 func newFmtState[T nune.Numeric](fmt string, t Tensor[T]) fmtState {
 	s := fmtState{
 		depth: 0,
-		esc:   len(t.shape) - 1,
+		esc:   t.Rank() - 1,
 	}
 
 	s.pad = cfgPad(fmt)

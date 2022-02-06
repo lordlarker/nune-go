@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -9,7 +9,7 @@ import (
 )
 
 func (t Tensor[T]) ReductOp(f func([]T) T) T {
-	return cpd.Reduct(t.data, f)
+	return cpd.Reduct(t.storage.Load(), f)
 }
 
 // Min returns the minimum value of all elements in the Tensor.

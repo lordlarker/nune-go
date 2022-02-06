@@ -1,4 +1,4 @@
-// Copyright © Lord Larker. All rights reserved.
+// Copyright © Larker. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -13,11 +13,11 @@ import (
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
 func (t Tensor[T]) Add(other Tensor[T]) Tensor[T] {
-	if !slice.Equal(t.shape, other.shape) {
+	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Add received a Tensor with a different shape than its own")
 	}
 
-	cpd.Op(t.data, other.data, t.data, func(t1, t2 T) T {
+	cpd.Op(t.storage.Load(), other.storage.Load(), t.storage.Load(), func(t1, t2 T) T {
 		return t1 + t2
 	})
 
@@ -28,11 +28,11 @@ func (t Tensor[T]) Add(other Tensor[T]) Tensor[T] {
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
 func (t Tensor[T]) Sub(other Tensor[T]) Tensor[T] {
-	if !slice.Equal(t.shape, other.shape) {
+	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Sub received a Tensor with a different shape than its own")
 	}
 
-	cpd.Op(t.data, other.data, t.data, func(t1, t2 T) T {
+	cpd.Op(t.storage.Load(), other.storage.Load(), t.storage.Load(), func(t1, t2 T) T {
 		return t1 - t2
 	})
 
@@ -43,11 +43,11 @@ func (t Tensor[T]) Sub(other Tensor[T]) Tensor[T] {
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
 func (t Tensor[T]) Mul(other Tensor[T]) Tensor[T] {
-	if !slice.Equal(t.shape, other.shape) {
+	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Mul received a Tensor with a different shape than its own")
 	}
 
-	cpd.Op(t.data, other.data, t.data, func(t1, t2 T) T {
+	cpd.Op(t.storage.Load(), other.storage.Load(), t.storage.Load(), func(t1, t2 T) T {
 		return t1 * t2
 	})
 
@@ -58,11 +58,11 @@ func (t Tensor[T]) Mul(other Tensor[T]) Tensor[T] {
 // by reference, over the two Tensor's elements, and then
 // returns the resulting Tensor.
 func (t Tensor[T]) Div(other Tensor[T]) Tensor[T] {
-	if !slice.Equal(t.shape, other.shape) {
+	if !slice.Equal(t.Shape(), other.Shape()) {
 		panic("nune/tensor: Tensor.Div received a Tensor with a different shape than its own")
 	}
 
-	cpd.Op(t.data, other.data, t.data, func(t1, t2 T) T {
+	cpd.Op(t.storage.Load(), other.storage.Load(), t.storage.Load(), func(t1, t2 T) T {
 		if t2 == T(0) {
 			panic("nune/tensor: division by zero occurred in Tensor.Div")
 		}
